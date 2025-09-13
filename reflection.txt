@@ -1,0 +1,13 @@
+1. Correctness
+Properties a CSV parser should have:
+- Should be able to correctly parse the data, perserving cases like quotations, commas inside one field, and empty/null values
+- Should return the parsed data in areadable format for the user, such as in a list of lists of strings or in the format of a given schema.
+- When a schema is provided, the parser should be able to utlize the schema and validate the rows of the csv.
+- When no schema is provided, the parser will default to returning a list of lists of strings.
+- If the csv is invalid with the given schema, the parser should return a ZodError to alert the user.
+
+2. Random, On-Demand Generation
+With a random, on-demand generator for csv files, there's a lot of ways that could inprove testing. For one, we could have the generator create  csv data that tackles our edge cases (commas in data, row count matches header, empty fields, etc.) and if need be, save that file for future testing if it exposes that our parser is failing at a certain edge case. Also, alongside a zod schema, we could have our generator create csv data that is meant to fit a chosen zod schema and see if it actually results in the expected behavior (whether the data fits the zod schema or not). Finally, we can have our generator create large csv files to test the maintability of our csv parser.
+
+3. Overall experience
+This assignment felt very different from previous CS assignments I've done, as

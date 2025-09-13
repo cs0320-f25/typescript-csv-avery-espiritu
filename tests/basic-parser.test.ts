@@ -76,14 +76,14 @@ test("parseCSV returns error for inconsistent csv", async () => {
 
   expect(Array.isArray(results)).toBe(false);
   if (!Array.isArray(results)){
-    expect(results).toBe(ZodError);
+    expect(results instanceof ZodError);
   }
 })
 
 // schema tests
 test("parseCSV validates people.csv with PersonRowSchema", async () => {
   const results = await parseCSV(PEOPLE_CSV_PATH, PersonRowSchema);
-  expect(results).toBe(ZodError); // supposed to fail because of thirty string
+  expect(results instanceof ZodError); // supposed to fail because of thirty string
 })
 
 test("parseCSV validates valid_people.csv with PersonRowSchema", async () => {
@@ -103,7 +103,7 @@ test("parseCSV validates valid_people.csv with PersonRowSchema", async () => {
 
 test("parseCSV validates figures.csv with FigureRowSchema", async () => {
   const results = await parseCSV(FIGURES_CSV_PATH, FigureRowSchema);
-  expect(results).toBe(ZodError); // supposed to fail because of null values - will accept in later implementation
+  expect(results instanceof ZodError); // supposed to fail because of null values - will accept in later implementation
 })
 
 

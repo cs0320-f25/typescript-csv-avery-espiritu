@@ -33,7 +33,7 @@ Variant 2:
 
 - #### Step 3: use an LLM to help expand your perspective.
 
-    Include a list of the top 4 enhancements or edge cases you think are most valuable to explore in the next week’s sprint. Label them clearly by category (extensibility vs. functionality), and include whether they came from you, the LLM, or both. Describe these using the User Story format—see below for a definition. 
+    Include a list of the top 4 enhancements or edge cases you think are most valuable to explore in the next week’s sprint. Label them clearly by category (extensibility vs. functionality), and include whether they came from you, the LLM, or both. Describe these using the User Story format—see below for a definition.
 
     User Story:
     - “As a user of this application, I want to be able to define my own schema for the csv I would like to parse and configure the parser settings based on my csv. I also want the csv parser to accept different types of data inputs, such as empty or quoted values.”
@@ -43,27 +43,44 @@ Variant 2:
     - The user can define a schema for the uploaded CSV, clarifying the types of data that are acceptable
     - The user can choose configurable options, such as including headers, how to handle null types, and more
 
-    Include your notes from above: what were your initial ideas, what did the LLM suggest, and how did the results differ by prompt? What resonated with you, and what didn’t? (3-5 sentences.) 
+    Include your notes from above: what were your initial ideas, what did the LLM suggest, and how did the results differ by prompt? What resonated with you, and what didn’t? (3-5 sentences.)
 
     - There was a lot of overlap with my initial ideas and the LLM, particularly with empty/null handing,schema validation, and inconsistent row/column counts. The LLM pointed out some handy edge cases like whitespace, handling different delimiters, and accounting for headers, and gave some interesting suggestions for enchancements, like with strict vs. loose parsing and configurable options. The two additional prompts also gave some valuable insight, focusing on functionality pitfalls with the naive split and elaborating on the configurable options, both of which really resonated with me. Some suggested missed the point like the validation hooks when Zod already fills that role, but I thought there was a lot of valuable feedback from the LLM paired with my own ideas.
 
 ### Design Choices
+- For adding the zod schema as a parameter for the parse function, I decided to have it such that we return the result if there is no schema provided, or iterate through rows of result for validation and use safeParse to check the row.
 
 ### 1340 Supplement
+N/A
 
 - #### 1. Correctness
 
+Properties a CSV parser should have:
+- Should be able to correctly parse the data, perserving cases like quotations, commas inside one field, and empty/null values
+- Should return the parsed data in areadable format for the user, such as in a list of lists of strings or in the format of a given schema.
+- When a schema is provided, the parser should be able to utlize the schema and validate the rows of the csv.
+- When no schema is provided, the parser will default to returning a list of lists of strings.
+- If the csv is invalid with the given schema, the parser should return a ZodError to alert the user.
+
 - #### 2. Random, On-Demand Generation
 
+With a random, on-demand generator for csv files, there's a lot of ways that could inprove testing. For one, we could have the generator create  csv data that tackles our edge cases (commas in data, row count matches header, empty fields, etc.) and if need be, save that file for future testing if it exposes that our parser is failing at a certain edge case. Also, alongside a zod schema, we could have our generator create csv data that is meant to fit a chosen zod schema and see if it actually results in the expected behavior (whether the data fits the zod schema or not). Finally, we can have our generator create large csv files to test the maintability of our csv parser.
+
 - #### 3. Overall experience, Bugs encountered and resolved
+This assignment felt very different from previous CS assignments I've done, as many simply ask for you to implement an algorithm and goes very sequentially. This one I felt I was jumping between tasks numerous times because it felt so open ended.
 #### Errors/Bugs:
+- One bug that I was trying to fix that I will need to go through later is the handling of headers. My correct schema test was failing because I originally included the headers in the csv, which had to be taken out later.
 #### Tests:
+- I have tests for the numerous edge cases, such as commas in one data field, empty fields, handing quotations, inconsistent row count with the header, and ensuring the correct data structure returned for non-schema parsing.
+- I have 3 schema tests, 2 that expect a Zod error, due to either wrong type in data or empty fields. The other uses a fixed version of the people.csv and should
 #### How To…
+- To run the parser, cd into the typescript-csv folder and compile the file using the typescript compiler with "npx tsc src/run-parser.ts". Then, run the javascript file with node.js with "node src/run-parser.js".
+- To run the tests, cd into the typescript-csv folder and ensure that you have jest installed. Then, you can run "npx jest tests/basic-parser.test.ts" to run the test suite.
 
 #### Team members and contributions (include cs logins):
 #### Collaborators (cslogins of anyone you worked with on this project and/or generative AI):
-    ChatGPT (chat logs in Task B answers)
+    ChatGPT (chat logs in Task B answers), Copilot for how to run the program and small type issues
 #### Total estimated time it took to complete project:
-    8 hours
-#### Link to GitHub Repo:  
+    10 hours
+#### Link to GitHub Repo:
     https://github.com/cs0320-f25/typescript-csv-avery-espiritu
