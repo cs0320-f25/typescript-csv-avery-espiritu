@@ -1,9 +1,11 @@
-import { parseCSV } from "../src/basic-parser";
+import { z, ZodError } from "zod";
+import { parseCSV, PersonRowSchema, Person, FigureRowSchema } from "../src/basic-parser";
 import * as path from "path";
 
 const PEOPLE_CSV_PATH = path.join(__dirname, "../data/people.csv");
 const FIGURES_CSV_PATH = path.join(__dirname, "../data/figures.csv");
 const BROKEN_CSV_PATH = path.join(__dirname, "../data/broken.csv");
+const VALID_PEOPLE_CSV_PATH = path.join(__dirname, "../data/valid_people.csv");
 
 test("parseCSV yields arrays", async () => {
   const results = await parseCSV(PEOPLE_CSV_PATH);
@@ -69,6 +71,39 @@ test("parseCSV returns only string[][]", async () => {
 })
 
 // test broken csv
-test("parseCSV returns expection for inconsistent csv", async () => {
+test("parseCSV returns error for inconsistent csv", async () => {
+  const results = await parseCSV(BROKEN_CSV_PATH);
 
+  expect(Array.isArray(results)).toBe(false);
+  if (!Array.isArray(results)){
+    expect(results).toBe(ZodError);
+  }
 })
+
+// schema tests
+test("parseCSV validates people.csv with PersonRowSchema", async () => {
+  const results = await parseCSV(PEOPLE_CSV_PATH, PersonRowSchema);
+  expect(results).toBe(ZodError); // supposed to fail because of thirty string
+})
+
+test("parseCSV validates valid_people.csv with PersonRowSchema", async () => {
+  const results = await parseCSV(VALID_PEOPLE_CSV_PATH, PersonRowSchema);
+  expect(Array.isArray(results)).toBe(true);
+
+  // Success path: res is Person[]
+  expect(Array.isArray(results)).toBe(true);
+  if(Array.isArray(results)){
+    expect(results.length).toBeGreaterThan(0);
+    for (const person of results as Person[]) { // not sure how to not typecast
+      expect(typeof person.name).toBe("string");
+      expect(typeof person.age).toBe("number");
+    }
+  }
+})
+
+test("parseCSV validates figures.csv with FigureRowSchema", async () => {
+  const results = await parseCSV(FIGURES_CSV_PATH, FigureRowSchema);
+  expect(results).toBe(ZodError); // supposed to fail because of null values - will accept in later implementation
+})
+
+

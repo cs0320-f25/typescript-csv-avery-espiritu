@@ -51,3 +51,13 @@ export async function parseCSV<T>(path: string, schema?: ZodType<T>): Promise<st
   }
   return schemaResult;
 }
+
+export const PersonRowSchema = z.tuple([z.string(), z.coerce.number()])
+  .transform((tup) => ({ name: tup[0], age: tup[1] }));
+
+export type Person = z.infer<typeof PersonRowSchema>;
+
+export const FigureRowSchema = z.tuple([z.string(), z.string(), z.string()])
+  .transform((tup) => ({ first: tup[0], last: tup[1], quote: tup[2]}))
+
+export type Figure = z.infer<typeof FigureRowSchema>
